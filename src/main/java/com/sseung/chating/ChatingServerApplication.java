@@ -9,5 +9,5 @@ public class ChatingServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ChatingServerApplication.class, args);
 	}
-
+	
 }
