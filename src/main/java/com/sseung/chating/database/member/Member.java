@@ -1,6 +1,9 @@
 package com.sseung.chating.database.member;
 
+import java.time.LocalDate;
 import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,10 +32,11 @@ public class Member {
 	private String nickname;
 
 	@Column
-	private Date birthday;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate birthday;
 
 	@Builder
-	public Member(String id, String password, String nickname, Date birthday) {
+	public Member(String id, String password, String nickname, LocalDate birthday) {
 	    this.id = id;
 	    this.password = password;
 	    this.nickname = nickname;
