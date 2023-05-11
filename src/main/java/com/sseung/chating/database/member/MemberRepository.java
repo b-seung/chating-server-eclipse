@@ -33,7 +33,23 @@ public class MemberRepository {
     			+ member.getNickname() + "', '" 
     			+ member.getBirthday() + "')";
     	
-    	System.out.println(sql);
+    	return jdbcTemplate.update(sql);
+    }
+
+    public boolean checkMemberInfo(String id, String nickname, LocalDate birthday) {
+    	String sql = "select id from member where (id, nickname, birthday) = ('"
+    					+ id + "', '"
+    					+ nickname + "', '"
+    					+ birthday + "')";
+    	
+    	List<String> list = jdbcTemplate.query(sql, idRowMapper());
+    	
+    	return list.size() == 1 ? true : false;
+    }
+    
+    public Object resetPassword(String id, String password) {
+    	String sql = "update member set password = '" + password + "' where id = '" + id + "'";
+    	
     	return jdbcTemplate.update(sql);
     }
 
@@ -49,4 +65,6 @@ public class MemberRepository {
             return rs.getString("id");
         };
     }
+    
+    
 }

@@ -1,5 +1,7 @@
 package com.sseung.chating.database.member;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,19 +79,25 @@ public class MemberController {
     public Object check(HttpServletRequest request) {
     	HttpSession session = request.getSession(false);
     	
-    	if (session != null) {
-    		return session.getAttribute(SessionConstants.LOGIN_MEMBER);
-    	}
+    	if (session != null) return session.getAttribute(SessionConstants.LOGIN_MEMBER);
     	
     	return "";
     }
     
     @PostMapping(path = "/join")
     public Object join(@RequestBody Member member) {
-    	System.out.println(member.getBirthday());
     	Object result = memberRepository.addMember(member);
-    	System.out.println(result);
     	return result;
+    }
+    
+    @GetMapping(path = "/passwordLost")
+    public boolean lostCheck(@RequestParam String id, @RequestParam String nickname, @RequestParam LocalDate birthday) {
+    	return memberRepository.checkMemberInfo(id, nickname, birthday);
+    }
+    
+    @PostMapping(path = "/passwordReset")
+    public Object resetPassword(@RequestBody HashMap<String, String> data) {
+    	return memberRepository.resetPassword(data.get("id"), data.get("password"));
     }
 
 }
