@@ -1,6 +1,7 @@
 package com.sseung.chating.database.member;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
@@ -90,13 +91,30 @@ public class MemberController {
     	return result;
     }
     
+    @PostMapping(path = "/update")
+    public boolean update(@RequestBody HashMap<String, String> data, HttpServletRequest request) {
+    	String id = data.get("id");
+    	String nickname = data.get("nickname");
+    	LocalDate birthday = LocalDate.parse(data.get("birthday"), DateTimeFormatter.ISO_DATE);
+
+    	memberRepository.updateUserInfo(data.get("originId"), id, nickname, birthday);
+    	    	
+    	HttpSession session = request.getSession();
+    	session.setAttribute(SessionConstants.LOGIN_MEMBER, memberRepository.getUserInfo(id).get(0));
+    	
+    	return true;
+    }
+    
+    
     @GetMapping(path = "/passwordLost")
     public boolean lostCheck(@RequestParam String id, @RequestParam String nickname, @RequestParam LocalDate birthday) {
     	return memberRepository.checkMemberInfo(id, nickname, birthday);
     }
     
     @PostMapping(path = "/passwordReset")
-    public Object resetPassword(@RequestBody HashMap<String, String> data) {
+    public Object resetPassword(@RequestBody HashMap<String, String> data, HttpServletRequest request) {
+    	HttpSession session = request.getSession();
+    	session.setAttribute(SessionConstants.LOGIN_MEMBER, memberRepository.getUserInfo(data.get("id")).get(0));
     	return memberRepository.resetPassword(data.get("id"), data.get("password"));
     }
 

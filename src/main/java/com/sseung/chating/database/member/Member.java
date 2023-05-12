@@ -12,9 +12,11 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 //lombok 어노테이션
 @Getter
+@Setter
 @NoArgsConstructor
 //JPA 어노테이션
 @Entity
