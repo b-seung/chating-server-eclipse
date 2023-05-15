@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.json.simple.*;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sseung.chating.web.SessionConstants;
 
@@ -78,11 +80,13 @@ public class MemberController {
     
     @GetMapping(path = "/check")
     public Object check(HttpServletRequest request) {
-    	HttpSession session = request.getSession(false);
+    	HttpSession session = request.getSession();
     	
-    	if (session != null) return session.getAttribute(SessionConstants.LOGIN_MEMBER);
+    	Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
     	
-    	return "";
+    	if (member == null) return "{\"error\": true}";
+    	
+		return member;
     }
     
     @PostMapping(path = "/join")

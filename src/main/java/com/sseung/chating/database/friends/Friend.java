@@ -21,15 +21,16 @@ import lombok.Setter;
 public class Friend {
 	@Id
 	@Column
-	private String user_id;
+	private String userId;
 	
 	@Id
 	@Column
-	private String friend_id;
+	private String friendId;
 	
 	@Builder
 	public Friend(String user_id, String friend_id) {
-		this.user_id = user_id;
-		this.friend_id = friend_id;
+		this.userId = user_id;
+		this.friendId = friend_id;
 	}
+	
 }
