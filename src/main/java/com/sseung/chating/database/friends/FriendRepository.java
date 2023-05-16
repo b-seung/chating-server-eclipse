@@ -35,6 +35,11 @@ public class FriendRepository {
 		return jdbcTemplate.update(sql); 
 	}
 	
+	public int deleteFriend(String my_id, String friend_id) {
+		String sql = "delete from friends where user_id = '" + my_id + "' and friend_id = '" + friend_id + "';";
+		return jdbcTemplate.update(sql); 
+	}
+	
 	public RowMapper<String> idRowMapper(String text) {
 		return (rs, rowNum) -> {
 			return rs.getString(text);
@@ -43,7 +48,10 @@ public class FriendRepository {
 	
 	public RowMapper<DoubleFriendInfo> infoRowMapper() {
 		return (rs, rowNum) -> {
-			return new DoubleFriendInfo(rowNum, rs.getString("user_id"), rs.getString("user_nickname"), rs.getString("friend_id"), rs.getString("friend_nickname"));
+			return new DoubleFriendInfo(rowNum, 
+					new FriendInfo(rs.getString("user_id"), rs.getString("user_nickname")),
+					new FriendInfo(rs.getString("friend_id"), rs.getString("friend_nickname"))
+			);
 		};
 	}
 	

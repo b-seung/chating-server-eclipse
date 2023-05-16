@@ -69,11 +69,30 @@ public class MemberController {
     	return true;
     }
     
-    @GetMapping(path = "idTest")
-    public boolean idTest(@RequestParam String id) {
+    @GetMapping(path = "isUsedId")
+    public boolean isUsedId(@RequestParam String id) {
     	List<String> memberIdList = memberRepository.getMembersId();
     	
     	if (memberIdList.indexOf(id) == -1) return true;
+    	
+    	return false;
+    }
+    
+    @GetMapping(path = "searchId")
+    public Object searchId(@RequestParam String id, HttpServletRequest request) {
+    	List<Member> resultList = memberRepository.getUserInfo(id);
+    	Member result = resultList.size() == 0 ? null : resultList.get(0);
+    	
+    	if (result != null) return "{\"isMyId\": " + isMyId(request, id) + ", \"id\": \"" + result.getId() + "\", \"nickname\": \"" + result.getNickname() + "\"}";
+    	
+    	return "{\"isMyId\": false, \"id\": null, \"nickname\": null}";
+    }
+    
+    public boolean isMyId(HttpServletRequest request, String id) {
+    	HttpSession session = request.getSession();
+    	Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
+    	
+    	if (member != null) return member.getId().equals(id);
     	
     	return false;
     }
