@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.json.simple.*;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sseung.chating.web.SessionConstants;
 
@@ -139,6 +137,20 @@ public class MemberController {
     	HttpSession session = request.getSession();
     	session.setAttribute(SessionConstants.LOGIN_MEMBER, memberRepository.getUserInfo(data.get("id")).get(0));
     	return memberRepository.resetPassword(data.get("id"), data.get("password"));
+    }
+    
+    @PostMapping(path = "/secession")
+    public Object secessionMember(@RequestBody HashMap<String, String> data, HttpServletRequest request) {
+    	HttpSession session = request.getSession();
+    	if (session == null) return "{\"error\": true}";
+    	
+    	Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
+    	
+    	if (member.getPassword().equals(data.get("password"))) {
+    		memberRepository.secessionMember(member.getId());
+    		return "{\"sucess\": true}";
+    	}
+    	else return "{\"sucess\": false}";
     }
 
 }

@@ -66,7 +66,10 @@ public class MemberRepository {
     	return jdbcTemplate.update(sql);
     }
 
-
+    public Object secessionMember(String id) {
+    	String sql = "delete from member where id = '" + id + "';";
+    	return jdbcTemplate.update(sql);
+    }
     
     public RowMapper<Member> memberRowMapper() {
         return (rs, rowNum) -> {
