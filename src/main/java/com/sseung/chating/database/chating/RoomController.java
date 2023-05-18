@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/room")
 public class RoomController {
@@ -19,9 +21,13 @@ public class RoomController {
 		return roomRepository.getAll();
 	}
 	
-	@GetMapping(path = "/getRoomId")
-	public Object getRoomId(@RequestParam String[] id) {
-		
-		return roomRepository.get(String.join("', '", id), id.length);
+	@GetMapping(path = "getRoomId")
+	public Object getRoomId(HttpServletRequest request) {
+		return roomRepository.getList();
+	}
+	
+	@GetMapping(path = "/clickChat")
+	public Object clickChat(@RequestParam String[] id) {
+		return roomRepository.getOrCreate(id);
 	}
 }
