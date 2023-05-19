@@ -1,5 +1,6 @@
 package com.sseung.chating.database.chating;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +45,15 @@ public class RoomRepository {
 		int created_room_id = jdbcTemplate.queryForObject(sql, Integer.class);
 		
 		for (String id : ids) {
-			jdbcTemplate.update("insert into user_room_info values (" + created_room_id + ", '" + id + "')");
+			String title = String.join(", ", (String[]) Arrays.stream(ids).filter(data -> !data.equals(id)).toArray());
+			jdbcTemplate.update("insert into user_room_info values (" + created_room_id + ", '" + id + "', '" + title + "')");
 		}
 		
 		return created_room_id;
+	}
+	
+	public void getList(String id) {
+		String sql = 
 	}
 	
 	public RowMapper<Integer> roomIdRowMapper() {

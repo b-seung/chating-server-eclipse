@@ -81,25 +81,20 @@ public class MemberController {
     	List<Member> resultList = memberRepository.getUserInfo(id);
     	Member result = resultList.size() == 0 ? null : resultList.get(0);
     	
-    	if (result != null) return "{\"isMyId\": " + isMyId(request, id) + ", \"id\": \"" + result.getId() + "\", \"nickname\": \"" + result.getNickname() + "\"}";
+    	if (result != null) {
+    		return "{\"isMyId\": " + SessionConstants.isMyId(request, id) 
+    				+ ", \"id\": \"" + result.getId()
+    				+ "\", \"nickname\": \""
+    				+ result.getNickname() + "\"}";
+    	}
     	
     	return "{\"isMyId\": false, \"id\": null, \"nickname\": null}";
     }
     
-    public boolean isMyId(HttpServletRequest request, String id) {
-    	HttpSession session = request.getSession();
-    	Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
-    	
-    	if (member != null) return member.getId().equals(id);
-    	
-    	return false;
-    }
     
     @GetMapping(path = "/check")
     public Object check(HttpServletRequest request) {
-    	HttpSession session = request.getSession();
-    	
-    	Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
+    	Member member = SessionConstants.getMember(request);
     	
     	if (member == null) return "{\"error\": true}";
     	
@@ -141,16 +136,16 @@ public class MemberController {
     
     @PostMapping(path = "/secession")
     public Object secessionMember(@RequestBody HashMap<String, String> data, HttpServletRequest request) {
-    	HttpSession session = request.getSession();
-    	if (session == null) return "{\"error\": true}";
+    	Member member = SessionConstants.getMember(request);
     	
-    	Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
+    	if (member == null) return "{\"error\": true}";
     	
     	if (member.getPassword().equals(data.get("password"))) {
     		memberRepository.secessionMember(member.getId());
     		return "{\"sucess\": true}";
     	}
-    	else return "{\"sucess\": false}";
+    	
+    	return "{\"sucess\": false}";
     }
 
 }

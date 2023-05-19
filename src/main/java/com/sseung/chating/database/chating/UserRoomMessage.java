@@ -16,9 +16,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 public class UserRoomMessage {
+	@Id
 	@Column
 	private int room_id;
 	
+	@Id
 	@Column
 	private String user_id;
 	

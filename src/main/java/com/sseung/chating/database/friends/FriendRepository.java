@@ -16,9 +16,14 @@ public class FriendRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
-	public List<String> getMyFriends(String id) {
-        List<String> list = jdbcTemplate.query("select friend_id from friends where user_id = '" + id + "';", idRowMapper("friend_id"));
-        return list;
+	public List<FriendInfo> getMyFriends(String id) {
+		String sql = "select friend_id, nickname"
+				+ 	" from friends"
+				+ 		" inner join member"
+				+ 		" on friends.friend_id = member.id"
+				+ 	" where user_id = '" + id + "';";
+
+        return jdbcTemplate.query(sql, idRowMapper());
     }
 	
 	public List<DoubleFriendInfo> getAllMyFriendList(String id) {
@@ -40,9 +45,9 @@ public class FriendRepository {
 		return jdbcTemplate.update(sql); 
 	}
 	
-	public RowMapper<String> idRowMapper(String text) {
+	public RowMapper<FriendInfo> idRowMapper() {
 		return (rs, rowNum) -> {
-			return rs.getString(text);
+			return new FriendInfo(rs.getString("friend_id"), rs.getString("nickname"));
 		};
 	}
 	

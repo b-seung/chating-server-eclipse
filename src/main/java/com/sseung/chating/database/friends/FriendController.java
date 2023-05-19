@@ -38,6 +38,7 @@ public class FriendController {
 	@GetMapping(path = "friendsList")
 	public Object getAllList(HttpServletRequest request) {
 		Member member = SessionConstants.getMember(request);
+		
 		if (member == null) return "{\"error\": true}";
 		String id = member.getId();
 		
@@ -71,6 +72,7 @@ public class FriendController {
 	@PostMapping(path = "addFriend")
 	public Object addFriend(@RequestBody HashMap<String, String> data, HttpServletRequest request) {
 		Member member = SessionConstants.getMember(request);
+		
 		if (member == null) return "{\"error\": true}";
 		String id = member.getId();
 		
@@ -80,6 +82,7 @@ public class FriendController {
 	@PostMapping(path = "deleteFriend")
 	public Object deleteFriend(@RequestBody HashMap<String, String> data, HttpServletRequest request) {
 		Member member = SessionConstants.getMember(request);
+		
 		if (member == null) return "{\"error\": true}";
 		String id = member.getId();
 		

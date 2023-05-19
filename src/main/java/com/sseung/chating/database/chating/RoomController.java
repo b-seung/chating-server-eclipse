@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sseung.chating.web.SessionConstants;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -27,7 +29,11 @@ public class RoomController {
 	}
 	
 	@GetMapping(path = "/clickChat")
-	public Object clickChat(@RequestParam String[] id) {
-		return roomRepository.getOrCreate(id);
+	public Object clickChat(@RequestParam String[] id, HttpServletRequest request) {
+		String myId = SessionConstants.getId(request);
+		String[] newIdList = Arrays.copyOf(id, id.length + 1);
+		newIdList[id.length] = myId;
+		
+		return roomRepository.getOrCreate(newIdList);
 	}
 }

@@ -11,9 +11,29 @@ public interface SessionConstants {
 	String LOGIN_MEMBER = "loginMember";
 	
 	public static Member getMember(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
+		HttpSession session = request.getSession();
+		Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
 		
-		if (session != null) return (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
+		if (member == null) return null;
+		
+		return member;
+	}
+	
+
+    public static boolean isMyId(HttpServletRequest request, String id) {
+    	HttpSession session = request.getSession();
+    	Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
+    	
+    	if (member == null) return false;
+    	
+    	return member.getId().equals(id);
+    }
+    
+	public static String getId(HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		Member member = (Member) session.getAttribute(SessionConstants.LOGIN_MEMBER);
+		
+		if (member != null) return member.getId();
 		
 		return null;
 	}
