@@ -1,4 +1,4 @@
-package com.sseung.chating.database.chating;
+package com.sseung.chating.database.chating.dto;
 
 import java.util.Date;
 
@@ -16,11 +16,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name="room_info")
+//@Table(name="room_info")
 public class RoomInfo {
 	@Id
 	@Column
 	private int room_id;
+
+	@Column
+	private String title;
 	
 	@Column
 	private int user_count;
@@ -30,4 +33,11 @@ public class RoomInfo {
 		this.room_id = id;
 		this.user_count = count;
 	}
+	
+	@Builder
+	public RoomInfo(int id, String title) {
+		this.room_id = id;
+		this.title = title;
+	}
+	
 }

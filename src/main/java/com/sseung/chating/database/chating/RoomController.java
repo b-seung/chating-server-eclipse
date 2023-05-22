@@ -1,6 +1,7 @@
 package com.sseung.chating.database.chating;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sseung.chating.socket.ChatRoom;
+import com.sseung.chating.socket.ChatRoomRepository;
 import com.sseung.chating.web.SessionConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +28,11 @@ public class RoomController {
 	
 	@GetMapping(path = "getRoomId")
 	public Object getRoomId(HttpServletRequest request) {
-		return roomRepository.getList();
+		String id = SessionConstants.getId(request);
+		
+		if (id == null) return "{\"error\": true}";
+		
+		return roomRepository.getList(id);
 	}
 	
 	@GetMapping(path = "/clickChat")
@@ -35,5 +42,16 @@ public class RoomController {
 		newIdList[id.length] = myId;
 		
 		return roomRepository.getOrCreate(newIdList);
+	}
+	
+	@GetMapping(path = "/openChat")
+	public Object openChat() {
+		Collection<ChatRoom> rooms = ChatRoomRepository.chatRooms;
+		
+		for (ChatRoom room : rooms) {
+			System.out.println(room.getRoomId() + "");
+		}
+		
+		return rooms;
 	}
 }
