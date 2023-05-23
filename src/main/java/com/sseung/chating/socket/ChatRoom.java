@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.util.Set;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.springframework.web.socket.WebSocketSession;
@@ -22,22 +23,28 @@ public class ChatRoom {
 	}
 	
 	public void handleMessage(WebSocketSession session, ChatMessage chatMessage, ObjectMapper objectMapper) throws JsonProcessingException {
-		System.out.println(chatMessage.getChatRoomId());
+		System.out.println("roomId: " + chatMessage.getChatRoomId());
         if (chatMessage.getType().equals("JOIN")) 
             join(session); 
-        else
+        else if (chatMessage.getType().equals("SEND"))
             send(chatMessage, objectMapper);
+        else
+        	remove(session);
     }
 	
 	private void join(WebSocketSession session) {
         sessions.add(session);
+        System.out.println("join : " + Arrays.toString(sessions.toArray()));
     }
 	
 	private <T> void send(T messageObject, ObjectMapper objectMapper) throws JsonProcessingException {
         TextMessage message = new TextMessage(objectMapper.writeValueAsString(messageObject));
-  
+        System.out.println(messageObject);
+        System.out.println(message);
+        
         sessions.parallelStream().forEach(session -> {
             try {
+            	System.out.println(session);
                 session.sendMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -46,6 +53,7 @@ public class ChatRoom {
     }
 	
 	public void remove(WebSocketSession target) {
+		System.out.println("close : " + target);
 		String targetId = target.getId();
 	    sessions.removeIf(session -> session.getId().equals(targetId));
 	}

@@ -7,7 +7,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 import lombok.RequiredArgsConstructor;
 
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSocket //웹소켓 활성화
 public class WebSocketConfig implements WebSocketConfigurer{
@@ -16,7 +16,7 @@ public class WebSocketConfig implements WebSocketConfigurer{
 		
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(handler, "/ws/chat").setAllowedOrigins().withSockJS();
+		registry.addHandler(handler, "/ws/chat").setAllowedOrigins("http://localhost:8080").withSockJS();
 	}
 	
 }
