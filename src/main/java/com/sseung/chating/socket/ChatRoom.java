@@ -27,7 +27,7 @@ public class ChatRoom {
         if (chatMessage.getType().equals("JOIN")) 
             join(session); 
         else if (chatMessage.getType().equals("SEND"))
-            send(chatMessage, objectMapper);
+            send(session.getId(), chatMessage, objectMapper);
         else
         	remove(session);
     }
@@ -37,15 +37,15 @@ public class ChatRoom {
         System.out.println("join : " + Arrays.toString(sessions.toArray()));
     }
 	
-	private <T> void send(T messageObject, ObjectMapper objectMapper) throws JsonProcessingException {
+	private <T> void send(String id, T messageObject, ObjectMapper objectMapper) throws JsonProcessingException {
         TextMessage message = new TextMessage(objectMapper.writeValueAsString(messageObject));
         System.out.println(messageObject);
         System.out.println(message);
         
         sessions.parallelStream().forEach(session -> {
             try {
-            	System.out.println(session);
-                session.sendMessage(message);
+            	System.out.println(session.getId().equals(id));
+                if (!session.getId().equals(id)) session.sendMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -8,5 +8,5 @@ public class ChatMessage {
 	private int chatRoomId;
 	private String message;
 	private String type;
-	private Date sendTime;
+	private String sendTime;
 }

@@ -17,7 +17,8 @@ public class ChatRoomRepository {
 		chatRooms = chatRoomMap.values();
 	}
 	
-	public ChatRoom getChatRoom(int roomId) {		
+	public ChatRoom getChatRoom(int roomId) {
+		System.out.println(roomId);
 		ChatRoom room = chatRoomMap.get(roomId);
 		if (room == null) {
 			room = new ChatRoom(roomId);

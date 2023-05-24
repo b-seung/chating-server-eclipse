@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.sseung.chating.database.chating.dto.RoomInfo;
-import com.sseung.chating.database.chating.dto.RoomMessage;
+import com.sseung.chating.database.chating.dto.Message;
 
 @Repository
 public class RoomRepository {
@@ -60,7 +60,7 @@ public class RoomRepository {
 		return jdbcTemplate.queryForObject("select title from user_room_info where room_id = '" + created_room_id + "';", roomTitleRowMapper());
 	}
 	
-	public List<RoomMessage> getList(String id) {
+	public List<Message> getList(String id) {
 		String sql = "select info.room_id, title, content, send_time"
 				+ 	" from user_room_info as info"
 				+ 	"	left join messages"
@@ -71,6 +71,11 @@ public class RoomRepository {
 				+ 	" order by send_time";
 		
 		return jdbcTemplate.query(sql, roomMsgMapper());
+	}
+	
+	public List<Message> getMessages(String id) {
+		String sql = "select * from messages where room_id = '" + id + "'";
+		return jdbcTemplate.query(sql, messageMapper());
 	}
 	
 	public RowMapper<Integer> roomIdRowMapper() {
@@ -91,9 +96,15 @@ public class RoomRepository {
 		};
 	}
 	
-	public RowMapper<RoomMessage> roomMsgMapper() {
+	public RowMapper<Message> roomMsgMapper() {
 		return (rs, rowNum) -> {
-			return new RoomMessage(rs.getInt("room_id"), rs.getString("title"), rs.getString("content"), rs.getTimestamp("send_time"));
+			return new Message(rs.getInt("room_id"), rs.getString("title"), rs.getString("content"), rs.getTimestamp("send_time"));
+		};
+	}
+	
+	public RowMapper<Message> messageMapper() {
+		return (rs, rowNum) -> {
+			return new Message(rs.getInt("room_id"), rs.getString("title"), rs.getString("from_id"), rs.getString("content"), rs.getTimestamp("send_time"));
 		};
 	}
 }
