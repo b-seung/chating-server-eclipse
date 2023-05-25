@@ -44,9 +44,8 @@ public class Message {
 	}
 	
 	@Builder
-	public Message(int room_id, String title, String from_id, String content, Date sended_time) {
+	public Message(int num, int room_id, String from_id, String content, Date sended_time) {
 		this.room_id = room_id;
-		this.title = title;
 		this.from_id = from_id;
 		this.content = content;
 		this.sended_time = sended_time;

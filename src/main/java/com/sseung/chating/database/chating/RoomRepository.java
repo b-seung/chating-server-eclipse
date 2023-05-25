@@ -1,5 +1,6 @@
 package com.sseung.chating.database.chating;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,37 +28,51 @@ public class RoomRepository {
 		return roomIds;
 	}
 	
-	public RoomInfo getOrCreate(String[] ids) {
-		if (ids.length > 2) return createRoom(ids);
+	public RoomInfo getOrCreate(String myId, String[] ids) {
+		if (ids.length > 2) return createRoom(myId, ids);
+		
+		System.out.println(ids.length);
 		
 		String idList = String.join("', '", ids);
 		
-		String sql = "select room_info.room_id, title from room_info right join ("
-				+ "select room_id, count(*) as count, title "
-				+ "from user_room_info "
-				+ "where user_id in ('" + idList +"') "
-				+ "group by room_id, title "
-				+ "having(count(room_id) = " + ids.length + ")) as userRoomInfo "
-			+ "on userRoomInfo.room_id = room_info.room_id "
-			+ "where user_count = count";
+		System.out.println(idList);
+		
+		String sql = "select room_info.room_id, title"
+				+ 	" from room_info"
+				+ 	"	right join ("
+				+ 	"		select room_id, count(*) as count"
+				+ 	"		from user_room_info"
+				+ 	"		where user_id in ('" + idList + "')"
+				+ 	"		group by room_id"
+				+ 	"		having count(room_id) = " + ids.length
+				+ 	"	) as userRoomInfo"
+				+ 	"	on userRoomInfo.room_id = room_info.room_id"
+				+ 	"	left join user_room_info"
+				+ 	"	on user_room_info.room_id = room_info.room_id"
+				+ 	" where user_count = count and user_id = '" + myId + "';";
 		
 		try {
 			return jdbcTemplate.queryForObject(sql, roomTitleRowMapper());
 		} catch (EmptyResultDataAccessException e) {
-			return createRoom(ids);
+			return createRoom(myId, ids);
 		}
 	}
 	
-	public RoomInfo createRoom(String[] ids) {
+	public RoomInfo createRoom(String myId, String[] ids) {
 		String sql = "insert into room_info (user_count) values (" + ids.length + ") returning room_id;";
 		int created_room_id = jdbcTemplate.queryForObject(sql, Integer.class);
+		String created_title = "";
 		
 		for (String id : ids) {
-			String title = String.join(", ", (String[]) Arrays.stream(ids).filter(data -> !data.equals(id)).toArray());
-			jdbcTemplate.update("insert into user_room_info values (" + created_room_id + ", '" + id + "', '" + title + "')");
+			Object[] list = Arrays.stream(ids).filter(data -> !data.equals(id)).toArray();
+			String title = String.join(", ", Arrays.copyOf(list, list.length, String[].class));
+			
+			if (id.equals(myId)) created_title = title;
+			
+			jdbcTemplate.update("insert into user_room_info values (" + created_room_id + ", '" + id + "', '" + title + "', '" + LocalDateTime.now() + "')");
 		}
 		
-		return jdbcTemplate.queryForObject("select title from user_room_info where room_id = '" + created_room_id + "';", roomTitleRowMapper());
+		return new RoomInfo(created_room_id, created_title);
 	}
 	
 	public List<Message> getList(String id) {
@@ -67,15 +82,25 @@ public class RoomRepository {
 				+ 	"	on info.room_id = messages.room_id"
 				+ 	"	left join (select max(num) from messages group by room_id) as msg"
 				+ 	"	on messages.num = msg.max"
-				+ 	" where user_id = '" + id + "'"
+				+ 	" where user_id = '" + id + "' and (messages.num is null or messages.num = msg.max)"
 				+ 	" order by send_time";
 		
 		return jdbcTemplate.query(sql, roomMsgMapper());
 	}
 	
 	public List<Message> getMessages(String id) {
-		String sql = "select * from messages where room_id = '" + id + "'";
+		String sql = "select * from messages where room_id = " + id + " order by send_time asc;";
 		return jdbcTemplate.query(sql, messageMapper());
+	}
+	
+	public Object addMessage(String roomId, String fromId, String message, String sendTime) {
+		String sql = "insert into messages (room_id, from_id, content, send_time)"
+				+ 	" values ('" + roomId
+				+ 	"', '" + fromId
+				+   "', '" + message
+				+   "', '" + sendTime + "');";
+		
+		return jdbcTemplate.update(sql);
 	}
 	
 	public RowMapper<Integer> roomIdRowMapper() {
@@ -104,7 +129,7 @@ public class RoomRepository {
 	
 	public RowMapper<Message> messageMapper() {
 		return (rs, rowNum) -> {
-			return new Message(rs.getInt("room_id"), rs.getString("title"), rs.getString("from_id"), rs.getString("content"), rs.getTimestamp("send_time"));
+			return new Message(rs.getInt("num"), rs.getInt("room_id"), rs.getString("from_id"), rs.getString("content"), rs.getTimestamp("send_time"));
 		};
 	}
 }
