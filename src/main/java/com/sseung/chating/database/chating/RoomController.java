@@ -69,7 +69,7 @@ public class RoomController {
 		String myId = SessionConstants.getId(request);
 		if (myId == null) return "{\"error\": true}";
 		
-		List<Message> messageList = roomRepository.getMessages(roomId);
+		List<Message> messageList = roomRepository.getMessages(myId, roomId);
 
 		return "{\"id\": \"" + myId + "\", \"messages\": " + new JSONArray(messageList) + "}";
 	}
@@ -77,5 +77,13 @@ public class RoomController {
 	@PostMapping(path = "/addMessage")
 	public Object addMessage(@RequestBody HashMap<String, String> data) {
 		return roomRepository.addMessage(data.get("roomId"), data.get("fromId"), data.get("message"), data.get("sendTime"));
+	}
+	
+	@PostMapping(path = "/deleteMessage")
+	public Object deleteMessage(@RequestBody HashMap<String, String> data, HttpServletRequest request) {
+		String myId = SessionConstants.getId(request);
+		if (myId == null) return "{\"error\": true}";
+		
+		return "{\"success\": " + roomRepository.deleteMessage(myId, data.get("id")) + "}";
 	}
 }

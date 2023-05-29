@@ -71,6 +71,12 @@ public class MemberRepository {
     	return jdbcTemplate.update(sql);
     }
     
+    public Object deleteData(String id) {
+    	int friend = jdbcTemplate.update("delete from friends where user_id = '" + id + "';");
+    	int rooms = jdbcTemplate.update("update user_room_info set created = '" + LocalDateTime.now() + "' where user_id = '" + id + "';");
+    	
+    	return "{\"friend\": " + friend + ", \"rooms\": " + rooms + "}";
+    }
     public RowMapper<Member> memberRowMapper() {
         return (rs, rowNum) -> {
             return new Member(rs.getString("id"), rs.getString("password"),

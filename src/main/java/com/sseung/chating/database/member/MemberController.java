@@ -151,6 +151,6 @@ public class MemberController {
     @PostMapping(path = "deleteData")
     public Object deleteData(@RequestBody HashMap<String, String> data) {
     	String id = data.get("id");
-    	
+    	return memberRepository.deleteData(id);
     }
 }
